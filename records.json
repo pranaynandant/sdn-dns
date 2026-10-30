@@ -1,0 +1,12 @@
+{
+    "www.cn.lab":   {"ip": "192.168.10.10", "ttl": 60},
+    "mail.cn.lab":  {"ip": "192.168.10.20", "ttl": 60},
+    "ftp.cn.lab":   {"ip": "192.168.10.30", "ttl": 60},
+    "db.cn.lab":    {"ip": "192.168.10.40", "ttl": 30},
+    "short.cn.lab": {"ip": "192.168.10.50", "ttl": 5},
+    "portal.cn.lab": {"alias": "www.cn.lab"},
+
+    "_delegations": {
+        "research.cn.lab": "10.0.0.14"
+    }
+}

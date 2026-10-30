@@ -1,0 +1,14 @@
+EXPERIMENT 1: server failure (ns1 killed after 5 s, 20 s run, ~20 queries/s)
+policy         answered   failed longest (ms)
+static               58        3        47.01
+round_robin         222        0      1003.92
+
+EXPERIMENT 2: caching (10 s, ~50 queries/s)
+variant          avg (ms)     p95 (ms)
+cache off           39.23        45.98
+cache on             0.37          0.0
+
+EXPERIMENT 3: load balancing (servers: 100 ms per request, 1 at a time; 3 clients, 10 s)
+policy         queries/second   avg (ms)   answered by
+static                   10.2     298.95   {'ns1': 102}
+round_robin              22.1     136.78   {'ns1': 74, 'ns3': 73, 'ns2': 74}

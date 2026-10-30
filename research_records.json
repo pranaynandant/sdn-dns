@@ -1,0 +1,5 @@
+{
+    "lab1.research.cn.lab": {"ip": "192.168.20.11", "ttl": 60},
+    "lab2.research.cn.lab": {"ip": "192.168.20.12", "ttl": 60},
+    "gpu.research.cn.lab":  {"ip": "192.168.20.100", "ttl": 60}
+}

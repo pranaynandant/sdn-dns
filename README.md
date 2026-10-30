@@ -2,7 +2,6 @@
 
 Computer Networks mini project. **Protocol: UDP.** Environment: Mininet + Open vSwitch + POX controller.
 
-**Team:** _add your names and SRNs here_
 
 A small DNS-like service: clients ask "what is the IP address of `www.cn.lab`?" over **UDP**,
 and name servers answer. An **SDN controller** decides which server answers each query,

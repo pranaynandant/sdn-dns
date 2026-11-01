@@ -95,7 +95,7 @@ class TestDNS(unittest.TestCase):
         self.assertGreaterEqual(time.time() - start, 0.2 + 0.4 + 0.8 - 0.05)   # back-off
 
     def test_8_retries_survive_packet_loss(self):
-        for _ in range(10):                               # server drops 50 % of requests
+        for i in range(10):                               # server drops 50 % of requests
             r = self.resolve("ftp.cn.lab", server="127.0.0.13", use_cache=False,
                              timeout=0.1, retries=8)
             self.assertEqual(r["status"], "OK")

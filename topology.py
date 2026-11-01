@@ -16,11 +16,11 @@ Run:   sudo python3 topology.py                    (dynamic SDN, round robin)
        sudo python3 topology.py --policy static    (baseline)
 """
 
-import argparse '''accepts args'''
-import os '''connect with os'''
+import argparse 
+import os 
 import subprocess
 import sys
-import time '''pauses'''
+import time
 from functools import partial
 
 from mininet.cli import CLI

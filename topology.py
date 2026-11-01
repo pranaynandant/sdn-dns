@@ -16,11 +16,11 @@ Run:   sudo python3 topology.py                    (dynamic SDN, round robin)
        sudo python3 topology.py --policy static    (baseline)
 """
 
-import argparse
-import os
+import argparse '''accepts args'''
+import os '''connect with os'''
 import subprocess
 import sys
-import time
+import time '''pauses'''
 from functools import partial
 
 from mininet.cli import CLI
@@ -35,7 +35,7 @@ if os.environ.get("SUDO_USER"):                       # with sudo, ~ is /root: u
 POX = os.environ.get("POX", POX)
 
 
-def start_controller(policy):
+def start_controller(policy): #POX is Plainold XML
     """Start POX with our controller in the background. Its log goes to controller.log."""
     log = open(os.path.join(HERE, "controller.log"), "w")
     env = dict(os.environ, PYTHONPATH=HERE)

@@ -116,7 +116,7 @@ def main():
     with open(os.path.join(HERE, "results.txt"), "w") as f:
         f.write(text + "\n")
 
-    try:                                               # optional chart
+    try:                                               # if exists. credit w3g
         import matplotlib
         matplotlib.use("Agg")
         import matplotlib.pyplot as plt

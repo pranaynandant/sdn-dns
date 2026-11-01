@@ -54,8 +54,10 @@ class DNSController(object):
         self.last_heartbeat = {ip: 0 for ip in SERVERS}     # server -> time of last heartbeat
         self.alive = {ip: False for ip in SERVERS}          # server -> True / False
         self.next_index = 0                                 # for round robin
+        self.count = {ip: 0 for ip in SERVERS}              # queries sent to each server
         core.openflow.addListeners(self)                    # receive OpenFlow events
         Timer(0.5, self.check_servers, recurring=True)      # health check every 0.5 s
+        Timer(10, self.log_counts, recurring=True)          # log the counts every 10 s
         log.info("DNS controller started, policy = %s", policy)
 
     # ------------------------------------------------------------ OpenFlow events
@@ -124,6 +126,7 @@ class DNSController(object):
         if server_ip is None:
             log.warning("no live DNS server - query dropped")
             return
+        self.count[server_ip] += 1
         server_mac = SERVERS[server_ip]
         client_ip, client_port = ip_pkt.srcip, udp_pkt.srcport
         out_port = self.mac_to_port.get(event.dpid, {}).get(server_mac, of.OFPP_FLOOD)
@@ -167,6 +170,11 @@ class DNSController(object):
             elif not self.alive[ip] and heard_recently:
                 self.alive[ip] = True
                 log.info("server %s is UP", ip)
+
+    def log_counts(self):
+        """Runs every 10 s: print how many queries each server has received."""
+        log.info("queries per server: %s",
+                 {str(ip): n for ip, n in self.count.items()})
 
     def mark_dead(self, ip, reason):
         if not self.alive[ip]:

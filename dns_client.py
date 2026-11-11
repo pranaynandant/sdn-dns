@@ -103,13 +103,13 @@ def resolve(name, server=VIP, port=53, use_cache=True, timeout=1.0, retries=2, v
 
 def show(result):
     """Print one result on one line."""
+    extra = f", redirects={result['redirects']}" if result.get("redirects") else ""
     if result["status"] == "OK":
         print(f"{result['name']:<22} -> {result['ip']:<15} {result['latency_ms']:8.2f} ms"
-              f"   (from {result['server']}, attempts={result['attempts']})")
+              f"   (from {result['server']}, attempts={result['attempts']}{extra})")
     else:
         print(f"{result['name']:<22} -> {result['status']:<15} {result['latency_ms']:8.2f} ms"
-              f"   (attempts={result['attempts']})")
-
+              f"   (attempts={result['attempts']}{extra})")
 
 def add_record(name, ip, server, port):
     """Ask a server to add a new name -> IP mapping."""

@@ -42,6 +42,7 @@ notices when a server fails, and sends the queries to the servers that are still
 3. The controller picks a live server (**round robin**) and installs **two rules** in the switch:
    - forward: `client → 10.0.0.53` is rewritten to `client → chosen server`
    - reverse: the server's reply is rewritten so it looks like it came from `10.0.0.53`
+   - The controller also counts the queries sent to each server and logs the totals every 10 s (in controller.log).
 4. The server looks up the name and replies. The client checks the reply (right server, right id), saves it in the cache and prints the time it took.
 5. Every server sends a **heartbeat** every 0.5 s. If a server stops (or its cable is cut), the controller marks it **DOWN** and deletes the rules, so the next queries go to the other servers.
 
@@ -53,7 +54,7 @@ The `static` policy is our **baseline**: it always uses ns1 and ignores failures
 |---|---|---|
 | `dns_server.py` | ~150 | the name server: UDP socket, look up names, aliases, REFER, add + copy to peers, heartbeats |
 | `dns_client.py` | ~180 | the client: send query, timeout + retry, cache, follow REFER, latency, `--bench` load test |
-| `dns_controller.py` | ~230 | the SDN controller (runs inside POX): proxy ARP, choose server, install rules, heartbeats, failure handling |
+| `dns_controller.py` | ~230 | the SDN controller (runs inside POX): proxy ARP, choose server, install rules, heartbeats, failure handling, per-server query counts logged every 10 s |
 | `topology.py` | ~120 | builds the Mininet network, starts the controller and the servers, opens the Mininet CLI |
 | `experiment.py` | ~140 | runs the 3 experiments (static vs dynamic) and writes `results.txt` and `results.png` |
 | `test_local.py` | ~110 | 9 automatic tests that run on any laptop (no Mininet needed) |
@@ -82,7 +83,7 @@ sudo python3 topology.py --policy static   # baseline
 ```
 c1 python3 dns_client.py www.cn.lab mail.cn.lab portal.cn.lab nope.cn.lab
 c1 python3 dns_client.py db.cn.lab --repeat 3          # caching: 2nd and 3rd answer "from cache"
-c2 python3 dns_client.py lab1.research.cn.lab          # redirect: "ns3 says: ask 10.0.0.14"
+c2 python3 dns_client.py lab1.research.cn.lab          # redirect: "ns3 says: ask 10.0.0.14", then "attempts=2, redirects=1"
 c3 python3 dns_client.py --bench 5 --no-cache          # answered by ns1, ns2, ns3 equally
 c1 python3 dns_client.py --add new.cn.lab 192.168.50.5 --server 10.0.0.11
 sh ovs-ofctl dump-flows s2                             # the rules the controller installed
@@ -122,6 +123,6 @@ From `experiment.py` (your numbers will be a little different):
 query  : {"type": "query", "id": 1234, "name": "www.cn.lab"}
 answer : {"id": 1234, "status": "OK", "name": "www.cn.lab", "ip": "192.168.10.10", "ttl": 60, "server": "ns1"}
 others : status "NOT_FOUND", or "REFER" with "ask": "10.0.0.14"
-add    : {"type": "add", "id": 99, "name": "new.cn.lab", "ip": "192.168.50.5"}
+add    : {"type": "add", "id": 99, "name": "new.cn.lab", "ip": "192.168.50.5", "ttl": 60}
 heartbeat (server -> 10.0.0.254:9999): {"type": "heartbeat", "server": "ns1"}
 ```

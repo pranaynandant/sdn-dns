@@ -61,6 +61,8 @@ def resolve(name, server=VIP, port=53, use_cache=True, timeout=1.0, retries=2, v
         del cache[name]                                   # expired: forget it
 
     attempts = 0
+    redirects = 0
+ 
     for _hop in range(3):                                 # follow at most 3 redirects
         reply = None
         wait = timeout
@@ -77,12 +79,14 @@ def resolve(name, server=VIP, port=53, use_cache=True, timeout=1.0, retries=2, v
 
         if reply is None:
             return {"status": "TIMEOUT", "name": name, "server": server, "attempts": attempts,
+                    "redirects": redirects,
                     "latency_ms": (time.time() - start) * 1000}
 
         # 3) REDIRECT: the server told us to ask another server.
         if reply["status"] == "REFER":
             if verbose:
                 print(f"   {reply['server']} says: ask {reply['ask']} for {name}")
+            redirects += 1
             server = reply["ask"]
             continue
         break
@@ -93,6 +97,7 @@ def resolve(name, server=VIP, port=53, use_cache=True, timeout=1.0, retries=2, v
 
     reply["latency_ms"] = (time.time() - start) * 1000
     reply["attempts"] = attempts
+    reply["redirects"] = redirects
     return reply
 
 
